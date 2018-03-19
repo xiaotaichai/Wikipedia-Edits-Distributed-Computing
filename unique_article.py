@@ -1,7 +1,7 @@
 import gzip
 counter = 0
 list=[0]*200000000
-with gzip.open("enwiki-20080103.good.gz",'r') as file:
+with gzip.open("/Akamai_scratch/enwiki-20080103.good.gz",'r') as file:
 	for line in file:
 		revision = line.decode().split("\x1f")
 		list[counter] = revision[0]
