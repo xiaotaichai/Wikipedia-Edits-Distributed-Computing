@@ -9,3 +9,8 @@
 
 Run `python3 unique_article.py`  
 Otherwise the base python2.7 will scream at you.
+
+### How to read head  
+```
+$ gzip -cd enwiki-20080103.good.gz | head -n 1
+```
