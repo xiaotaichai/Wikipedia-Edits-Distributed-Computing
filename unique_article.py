@@ -8,6 +8,6 @@ with gzip.open("/Akamai_scratch/enwiki-20080103.good.gz",'r') as file:
 		list[counter] = revision[0]
 		counter +=1
 	list = list[0,counter]
-	list = unique(list)
+	list = set(list)
 	list.write('unique_article\n')
 	print (len(list))
