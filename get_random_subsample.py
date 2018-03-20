@@ -15,8 +15,8 @@ selected_ids = [id.rstrip('\n') for id in selected_ids]
 class RandomSubsample(MRJob):
 
     def mapper(self, _, line):
-        revision = line.decode().split("\x1e")[0]
-        article_id = str(revision).split(' ')[1]
+        revision = line.split('\x1e')[0]
+        article_id = revision.split(' ')[1]
 
         if article_id in selected_ids:
             yield 'key', line
