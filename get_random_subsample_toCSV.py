@@ -1,4 +1,5 @@
 from mrjob.job import MRJob
+from mr3px.csvprotocol import CsvProtocol
 import gzip
 import random
 
@@ -14,6 +15,8 @@ selected_ids = [id.rstrip('\n') for id in selected_ids]
 
 class RandomSubsample(MRJob):
 
+    OUTPUT_PROTOCOL = CsvProtocol
+
     def mapper(self, _, line):
 
         article_id = line.split('<<sep>>')[0]
@@ -21,9 +24,8 @@ class RandomSubsample(MRJob):
         if article_id in selected_ids:
             yield 'key', line
 
-    def reducer(self, key, records):
-        for rec in records:
-            yield rec
+    def reducer(self, key, record):
+        yield record
 
 
 if __name__ == '__main__':
