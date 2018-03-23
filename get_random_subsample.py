@@ -3,7 +3,7 @@ import gzip
 import random
 
 # read in list of unique article id's
-with gzip.open('unique_all_articleids.gz','rt') as infile:
+with gzip.open('/Akamai_scratch/fanny_kevin_lydia_xiaotai/Wikipedia-Edits-Distributed-Computing/unique_all_articleids.gz','rt') as infile:
     all_ids = infile.readlines()
 
 # select n of those id's and strip the new lines

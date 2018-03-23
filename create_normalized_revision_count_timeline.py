@@ -8,8 +8,12 @@ class RandomSubsample(MRJob):
     def mapper(self, _, line):
 
         article_id = line.split('<<sep>>')[0]
-        article_name = line.split('<<sep>>')[2]
-        revision_date = line.split('<<sep>>')[3]
+        try:
+            article_name = line.split('<<sep>>')[2]
+            revision_date = line.split('<<sep>>')[3]
+        except IndexError:
+            print(line)
+            raise
 
         yield [article_id, article_name], revision_date
 
