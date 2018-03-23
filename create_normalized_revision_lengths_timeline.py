@@ -12,13 +12,15 @@ class RandomSubsample(MRJob):
         # article_name = line.split('<<sep>>')[2]
         # revision_date = line.split('<<sep>>')[3]
         # revision_length = line.split('<<sep>>')[-1]
-        parts = line.split('<<sep>>')
-        article_id = parts[0]
-        article_name = parts[2]
-        revision_date = parts[3]
-        revision_length = parts[-1]
+        line = line.strip()
+        if line:
+            parts = line.split('<<sep>>')
+            article_id = parts[0]
+            article_name = parts[2]
+            revision_date = parts[3]
+            revision_length = parts[-1]
 
-        yield [article_id, article_name], [revision_date, revision_length]
+            yield [article_id, article_name], [revision_date, revision_length]
 
     def reducer(self, key, records):
         monthly_revision_count = [0]*96
