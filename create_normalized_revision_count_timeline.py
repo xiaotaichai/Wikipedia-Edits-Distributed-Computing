@@ -6,14 +6,27 @@ class RandomSubsample(MRJob):
     #OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
+        if type(line) is bytes:
+            print('Bytes!!!!')
+        elif type(line) is str:
+            print('String!!!')
+        input()
+        record = line.split('/x1e')
+        article_info = record[0].split(' ')
 
-        article_id = line.split('<<sep>>')[0]
-        try:
-            article_name = line.split('<<sep>>')[2]
-            revision_date = line.split('<<sep>>')[3]
-        except IndexError:
-            print(line)
-            raise
+        article_id = article_info[1]
+        article_name = article_info[3]
+        revision_date = article_info[4]
+
+
+
+        # article_id = line.split('<<sep>>')[0]
+        # try:
+        #     article_name = line.split('<<sep>>')[2]
+        #     revision_date = line.split('<<sep>>')[3]
+        # except IndexError:
+        #     print(line)
+        #     raise
 
         yield [article_id, article_name], revision_date
 
@@ -23,9 +36,9 @@ class RandomSubsample(MRJob):
             year, month = record.split('-')[0], record.split('-')[1]
             index = (int(year) - 2001)*12 + int(month) - 1
             monthly_revision_count[index] += 1
-        
+
         normalized = [float(i)/sum(monthly_revision_count) for i in monthly_revision_count]
         yield key, normalized
-        
+
 if __name__ == '__main__':
     RandomSubsample.run()
