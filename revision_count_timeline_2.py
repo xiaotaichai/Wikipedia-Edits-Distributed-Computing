@@ -7,17 +7,19 @@ class RevisionTimeline(MRJob):
     #OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
-        data = line.split('<<sep>>')
-        if len(data) == 18:
-            article_id = data[0]
-            article_name = data[2]
-            revision_date = dt.datetime.strptime(data[3],'%Y-%m-%dT%H:%M:%SZ')
+        record = line.split('/x1e')
+        article_info = record[0].split(' ')
 
-            revision_day = (revision_date - dt.datetime(2001,1,1)).days
-            revision_time = (revision_date - dt.datetime(2001,1,1)).seconds
-            revision_length = data[-1]
+        article_id = article_info[1]
+        article_name = article_info[3]
 
-            yield (article_id, article_name), (revision_day,revision_time,revision_length)
+        revision_date = dt.datetime.strptime(article_info[4],'%Y-%m-%dT%H:%M:%SZ')
+        revision_day = (revision_date - dt.datetime(2001,1,1)).days
+        revision_time = (revision_date - dt.datetime(2001,1,1)).seconds
+
+        revision_length = record[12].split(' ')[1]
+        
+        yield (article_id, article_name), (revision_day,revision_time,revision_length)
 
 
     def reducer(self, key, revisions):
