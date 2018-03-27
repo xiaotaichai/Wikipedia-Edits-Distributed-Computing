@@ -4,7 +4,7 @@ import datetime as dt
 
 class RevisionTimeline(MRJob):
 
-    OUTPUT_PROTOCOL = TextValueProtocol
+    # OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
         record = line.split('\x1e')
@@ -13,7 +13,8 @@ class RevisionTimeline(MRJob):
         article_id = article_info[1]
         article_name = article_info[3]
 
-        revision_datetime = dt.datetime.strptime(article_info[4],'%Y-%m-%dT%H:%M:%SZ')
+        revision_datetime = article_info[4]
+        # revision_datetime = dt.datetime.strptime(article_info[4],'%Y-%m-%dT%H:%M:%SZ')
         # revision_day = (revision_date - dt.datetime(2001,1,1)).days
         # revision_time = (revision_date - dt.datetime(2001,1,1)).seconds
 
@@ -30,7 +31,7 @@ class RevisionTimeline(MRJob):
         num_revisions = 0
         revisions = list(revisions)
         for r in revisions:
-            revision_datetime = r[0]
+            revision_datetime = dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ')
             if revision_datetime < creation_datetime:
                 creation_datetime = revision_datetime
             # if revision_day < creation_day:
