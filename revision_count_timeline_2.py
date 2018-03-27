@@ -4,7 +4,7 @@ import datetime as dt
 
 class RevisionTimeline(MRJob):
 
-    #OUTPUT_PROTOCOL = TextValueProtocol
+    OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
         record = line.split('\x1e')
