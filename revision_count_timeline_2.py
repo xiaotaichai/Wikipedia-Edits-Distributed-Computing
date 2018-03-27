@@ -7,7 +7,7 @@ class RevisionTimeline(MRJob):
     #OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
-        record = line.split('/x1e')
+        record = line.split('\x1e')
         article_info = record[0].split(' ')
 
         article_id = article_info[1]
@@ -18,7 +18,7 @@ class RevisionTimeline(MRJob):
         revision_time = (revision_date - dt.datetime(2001,1,1)).seconds
 
         revision_length = record[12].split(' ')[1]
-        
+
         yield (article_id, article_name), (revision_day,revision_time,revision_length)
 
 

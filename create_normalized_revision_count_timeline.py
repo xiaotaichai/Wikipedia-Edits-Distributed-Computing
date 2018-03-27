@@ -1,13 +1,13 @@
 from mrjob.job import MRJob
 from mrjob.protocol import TextValueProtocol
 
-class RandomSubsample(MRJob):
+class RevisionCountTimeline(MRJob):
 
     #OUTPUT_PROTOCOL = TextValueProtocol
 
     def mapper(self, _, line):
 
-        record = line.split('/x1e')
+        record = line.split('\x1e')
         article_info = record[0].split(' ')
 
         article_id = article_info[1]
@@ -27,4 +27,4 @@ class RandomSubsample(MRJob):
         yield key, normalized
 
 if __name__ == '__main__':
-    RandomSubsample.run()
+    RevisionCountTimeline.run()
