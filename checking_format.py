@@ -7,11 +7,20 @@ class CheckFormat(MRJob):
 
         record = line.split('\x1e')
         revision_info = record[0].split(' ')
+        record_length = len(record)
+        rev_info_length = len(revision_info)
 
-        if len(revision_info) != 7:
-            yield 'revision info not good', 1
+        if rev_info_length != 7:
+            if record_length != 13:
+                yield 'record length and revision info length is bad', 1
+            else:
+                yield 'revision info length bad, record length good', 1
         else:
-            yield 'revision info good', 1
+            if record_length != 13:
+                yield 'record length bad, revision info length good', 1
+            else:
+                yield 'revision info length and record length good', 1
+
 
     def reducer(self, key, values):
         yield key, sum(values)
