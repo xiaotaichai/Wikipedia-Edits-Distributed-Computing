@@ -45,7 +45,7 @@ class RevisionTimeline(MRJob):
         # normalized_revision_timeline = [((dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ') - creation_datetime).days, (dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ') - creation_datetime).seconds ,r[1], r[2]) for r in revisions]
         num_revisions = values[2]
         normalized_revision_timeline = []*num_revisions
-        
+
         creation_datetime = dt.datetime.strptime(values[1],'%Y-%m-%dT%H:%M:%SZ')
         revisions = values[0]
         i = 0
@@ -54,7 +54,7 @@ class RevisionTimeline(MRJob):
             time_since_creation = revision_datetime - creation_datetime
             normalized_revision_timeline[i] = [time_since_creation.days, time_since_creation.seconds, r[1], r[2]]
             i += 1
-        yield key + (creation_datetime.strftime('%Y-%m-%d %H:%M:%S', num_revisions), normalized_revision_timeline
+        yield key + (creation_datetime.strftime('%Y-%m-%d %H:%M:%S'),num_revisions), normalized_revision_timeline
 
     def steps(self):
         return [
