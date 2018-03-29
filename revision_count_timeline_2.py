@@ -45,6 +45,7 @@ class RevisionTimeline(MRJob):
         # normalized_revision_timeline = [((dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ') - creation_datetime).days, (dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ') - creation_datetime).seconds ,r[1], r[2]) for r in revisions]
         num_revisions = values[2]
         normalized_revision_timeline = []*num_revisions
+        
         creation_datetime = dt.datetime.strptime(values[1],'%Y-%m-%dT%H:%M:%SZ')
         revisions = values[0]
         i = 0
