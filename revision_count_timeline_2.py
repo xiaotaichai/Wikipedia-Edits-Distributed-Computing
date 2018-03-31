@@ -25,7 +25,7 @@ class RevisionTimeline(MRJob):
     def reducerCreateTimeline(self, key, revisions):
         creation_datetime = dt.datetime.now()
         revisions = list(revisions)
-        
+
         for r in revisions:
             revision_datetime = dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ')
             if revision_datetime < creation_datetime:
@@ -62,11 +62,10 @@ class RevisionTimeline(MRJob):
     #         normalized_revision_timeline[i] = [time_since_creation.days, time_since_creation.seconds, r[1], r[2]]
     #         i += 1
     #     yield key + (creation_datetime.strftime('%Y-%m-%d %H:%M:%S'),num_revisions), normalized_revision_timeline
-    #
     def steps(self):
         return [
             MRStep(mapper=self.mapperGroupRevisions,
-                   reducer=self.reducerCreateTimeline),
+                   reducer=self.reducerCreateTimeline)
         ]
 
 if __name__ == '__main__':
