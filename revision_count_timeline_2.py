@@ -1,5 +1,5 @@
 from mrjob.job import MRJob
-# from mrjob.step import MRStep
+from mrjob.step import MRStep
 # from mrjob.protocol import TextValueProtocol
 import datetime as dt
 
