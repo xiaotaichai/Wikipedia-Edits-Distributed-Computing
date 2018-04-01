@@ -1,0 +1,22 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(data.table)
+library(here)
+```
+```{r}
+#system("sed 's/<<sep>>/,/g' all_revisions_1000_articles.txt > all_revisions_1000_articles_commaseparated.txt")
+
+all.revisions.1000.path <- here("all_revisions_1000_articles_commaseparated.txt")
+
+revisions <- read.table(all.revisions.1000.path, sep = ",", fill=TRUE)
+head(revisions)
+```
+
