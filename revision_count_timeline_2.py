@@ -36,7 +36,7 @@ class RevisionTimeline(MRJob):
 
         if creation_datetime < dt.datetime.strptime('2003-01-01','%Y-%m-%d'):
             num_revisions = len(revisions)
-            normalized_revision_timeline = []*num_revisions
+            normalized_revision_timeline = [[] for i in range(num_revisions)]
 
             # creation_datetime = dt.datetime.strptime(values[1],'%Y-%m-%dT%H:%M:%SZ')
             # revisions = values[0]
