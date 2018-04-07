@@ -7,7 +7,7 @@ outfile = open('./creation_timelines_5yrs_new.csv', 'w')
 outfile.write('article_id,article_name,creation_datetime,num_revisions,all_revisions')
 
 line_pattern = '\["([0-9]+?)", "(.+?)"\]\s*\["([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})", ([0-9]+?), \[(.+)\]\]'
-with open('./creation_timelines_all.txt','r') as infile:
+with open('./creation_timelines_5yrs.txt','r') as infile:
     for line in infile:
         parts = re.findall(line_pattern, line)
         new_line = '{0},"{1}",{2},{3},"{4}"\n'.format(parts[0],parts[1],parts[2],parts[3],parts[4])
