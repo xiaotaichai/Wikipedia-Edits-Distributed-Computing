@@ -12,6 +12,8 @@ with open('./creation_timelines_5yrs_new.txt','r') as infile:
         parts = re.findall(line_pattern, line)
         print(len(parts))
         print(parts)
+        print(parts[0])
+        print(parts[0][0])
         new_line = '{0},"{1}",{2},{3},"{4}"\n'.format(parts[0],parts[1],parts[2],parts[3],parts[4])
         outfile.write(new_line)
         progress += 1
