@@ -20,7 +20,7 @@ class RevisionTimeline(MRJob):
         revision_length = int(record[12].split(' ')[1])
         minor_flag = int(record[11].split(' ')[1])
 
-        yield [article_id, article_name], [revision_datetime_str, revision_length, minor_flag, user_name, user_name]
+        yield [article_id, article_name], [revision_datetime_str, revision_length, minor_flag, user_name, user_id]
 
 
     def reducerCreateTimeline(self, key, revisions):
