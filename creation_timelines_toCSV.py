@@ -9,7 +9,7 @@ outfile.write('article_id,article_name,creation_datetime,num_revisions,all_revis
 line_pattern = '\["([0-9]+?)", "(.+?)"\]\s*\["([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})", ([0-9]+?), \[(.+)\]\]'
 with open('./creation_timelines_5yrs_new.txt','r') as infile:
     for line in infile:
-        parts = re.findall(line_pattern, line)[0]
+        parts = list(re.findall(line_pattern, line)[0])
         # remove qutoes from the revision authour usernames
         parts[4] = re.sub('"','',parts[4])
 
