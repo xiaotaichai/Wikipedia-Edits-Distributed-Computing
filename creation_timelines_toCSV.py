@@ -4,7 +4,7 @@ import re
 progress = 0
 outfile = open('./creation_timelines_5yrs.csv', 'w')
 # write header
-outfile.write('article_id,article_name,creation_datetime,num_revisions,all_revisions')
+outfile.write('article_id,article_name,creation_datetime,num_revisions,all_revisions\n')
 
 line_pattern = '\["([0-9]+?)", "(.+?)"\]\s*\["([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})", ([0-9]+?), \[(.+)\]\]'
 with open('./creation_timelines_5yrs_new.txt','r') as infile:
@@ -21,3 +21,4 @@ with open('./creation_timelines_5yrs_new.txt','r') as infile:
         if progress%100000 == 0:
             print('{} lines processed so far'.format(progress))
 outfile.close()
+print('Done')
