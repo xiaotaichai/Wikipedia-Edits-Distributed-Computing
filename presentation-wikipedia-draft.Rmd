@@ -24,7 +24,7 @@ Spring
 
 ---
 
-
+class: center, middle 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(data.table)
@@ -95,11 +95,16 @@ p <- ggplot(data = monthly.counts, aes(x=year_month, y = count, colour = article
 p
 ```
 
-
-
-
-
 ---
+class: center, middle  
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+ggplotly(p)
+```
+
+
+
+---  
 
 background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
 
