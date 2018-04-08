@@ -3,6 +3,10 @@
 Xarignan version  
 https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html  
 
+
+Rmd Analysis in Web readable format  
+https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/eda_revisions_1000.html
+
 Nevermind Rstudio presentation quit rendering on me at 4am..  
 
 
