@@ -1,10 +1,9 @@
 # Wikipedia-Edits-Distributed-Computing
 
 Xarignan version  
-https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html#4  
+https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html  
 
-Rstudio Projects version  
-https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html
+Nevermind Rstudio presentation quit rendering on me at 4am..  
 
 
 * Generate a list of unique article_ids  
