@@ -1,5 +1,11 @@
 # Wikipedia-Edits-Distributed-Computing
 
+Xarignan version  
+https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html#4  
+
+Rstudio Projects version  
+https://rawgit.com/xiaotaichai/Wikipedia-Edits-Distributed-Computing/dataviz/presentation-wikipedia-draft.html
+
 
 * Generate a list of unique article_ids  
 * Aggregate attributes associated with each article_id  
