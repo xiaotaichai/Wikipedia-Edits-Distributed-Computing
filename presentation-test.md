@@ -1,6 +1,6 @@
-Analysis of Wikipedia Edits
+Analysis of Wikipedia Edit History
 ========================================================
-authors: Kevin, Lydia, Fanny, Xiaotai
+author: Kevin, Lydia, Fanny, Xiaotai
 date: Spring 2018
 autosize: true
 
@@ -12,6 +12,35 @@ For more details on authoring R presentations please visit <https://support.rstu
 - Bullet 1
 - Bullet 2
 - Bullet 3
+
+
+Slide With Plot
+========================================================
+
+![plot of chunk unnamed-chunk-1](presentation-test-figure/unnamed-chunk-1-1.png)
+
+Slide With Plot
+========================================================
+
+```r
+# ggplotly(p)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Slide With Code
 ========================================================
@@ -34,4 +63,4 @@ summary(cars)
 Slide With Plot
 ========================================================
 
-![plot of chunk unnamed-chunk-2](presentation-test-figure/unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-4](presentation-test-figure/unnamed-chunk-4-1.png)

@@ -8,11 +8,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Combining Kevin's Readme with additional graphics  
+Combining Kevin's Readme with plotly interactive graphics  
 
 
 # Load libraries  
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(data.table)
 library(here)
 library(tidyverse)
@@ -31,7 +31,7 @@ Replace `<<sep>>` with a special character.
 ```
 
 # Read in data  
-```{r}
+```{r, cache=TRUE}
 all.revisions.1000.path <- here::here("all_revisions_1000_articles_caratseparated.txt")
 
 revisions <- read.table(all.revisions.1000.path, 
@@ -102,7 +102,7 @@ categories.counts <- categories.df %>%
 # Back to Working with Dates  
 
 ##create monthly counts  
-```{r}
+```{r, cache=TRUE}
 monthly.counts <- revisions.processed %>% 
   # select(article_id, year, month, year.mon) %>% 
   group_by(article_id, year_month) %>% 
@@ -119,7 +119,7 @@ p <- ggplot(data = monthly.counts, aes(x=year_month, y = count, colour = article
 
 p
 
-# ggplotly(p)
+ggplotly(p)
 ```
   
     
@@ -173,22 +173,22 @@ articles.before.2006 <- percent.revisions %>%
 
 
 
-```{r}
-t.first <- percents[!duplicated(percents$article_id),]
-arrange(t.first, desc(date))
-t.first.before2003 <- subset(t.first, as.yearmon(date) < as.yearmon("2003-01"))
-arrange(t.first.before2003, desc(date))
-```
+<!-- ```{r} -->
+<!-- t.first <- percents[!duplicated(percents$article_id),] -->
+<!-- arrange(t.first, desc(date)) -->
+<!-- t.first.before2003 <- subset(t.first, as.yearmon(date) < as.yearmon("2003-01")) -->
+<!-- arrange(t.first.before2003, desc(date)) -->
+<!-- ``` -->
 
 
-So now we know which article_id's were created before 2006.
-We need to subset the data for these article_ids
-```{r}
-filtered_revisions <- percents[percents$article_id %in% t.first.before2003$article_id, ]
-arrange(filtered_revisions, article_id)
-ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + geom_point()
-ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + ylim(0,.5) + geom_point()
-```
+<!-- So now we know which article_id's were created before 2006. -->
+<!-- We need to subset the data for these article_ids -->
+<!-- ```{r} -->
+<!-- filtered_revisions <- percents[percents$article_id %in% t.first.before2003$article_id, ] -->
+<!-- arrange(filtered_revisions, article_id) -->
+<!-- ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + geom_point() -->
+<!-- ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + ylim(0,.5) + geom_point() -->
+<!-- ``` -->
 
 
 

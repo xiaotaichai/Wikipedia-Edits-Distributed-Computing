@@ -1,6 +1,6 @@
-Analysis of Wikipedia Edits
+Analysis of Wikipedia Edit History
 ========================================================
-authors: Kevin, Lydia, Fanny, Xiaotai
+author: Kevin, Lydia, Fanny, Xiaotai
 date: Spring 2018
 autosize: true
 
@@ -12,6 +12,101 @@ For more details on authoring R presentations please visit <https://support.rstu
 - Bullet 1
 - Bullet 2
 - Bullet 3
+
+
+Slide With Plot
+========================================================
+
+```{r, echo=FALSE}
+library(data.table)
+library(here)
+library(tidyverse)
+library(plotly)
+library(janitor)
+library(lubridate)
+library(zoo)
+
+all.revisions.1000.path <- here::here("all_revisions_1000_articles_caratseparated.txt")
+
+revisions <- read.table(all.revisions.1000.path, 
+                        sep = "^",
+                        quote="",
+                        header=FALSE,
+                        stringsAsFactors = FALSE,
+                        col.names = c("article_id", "rev_id", "article_title", "timestamp", "[ip:]username", "user_id", "CATEGORY", "IMAGE", "MAIN", "TALK", "USER", "USER_TALK", "OTHER", "EXTERNAL",
+      "TEMPLATE", "COMMENT", "MINOR", "TEXTDATA"),
+      fill=TRUE)
+
+revisions.processed <- revisions %>% 
+  clean_names() %>% 
+  mutate(timestamp = gsub("T", " ", timestamp)) %>% 
+  mutate(timestamp = gsub("Z", "", timestamp)) %>% 
+  mutate(timestamp = ymd_hms(timestamp)) %>% 
+  mutate(year = year(timestamp)) %>% 
+  mutate(month = month(timestamp)) %>% 
+  mutate(year_month = as.yearmon(timestamp))
+
+categories <-  revisions.processed %>% 
+  group_by(article_id) %>% 
+  summarise(categories=paste(category, collapse = " "))
+
+categories$categories <- sapply(strsplit(categories$categories, split=" "), function(x) {
+  paste0(unique(trimws(x)), collapse = ', ')
+})
+
+categories.df <- as.data.frame(str_split_fixed(categories$categories, ", ", max(unlist(lapply(strsplit(categories$categories, ", "), length)))))
+
+categories.df <- categories.df[,-1]
+names(categories.df) <- paste0("category_", 1:ncol(categories.df))
+categories.df <- cbind(article_id = categories$article_id, categories.df)
+
+categories.counts <- categories.df %>% 
+  gather(category, categories, -article_id) %>%
+  replace(. == "", NA) %>%
+  filter(!is.na(categories)) %>%
+  select(-category) %>%
+  group_by(categories) %>%
+  summarise(number = n()) %>%
+  arrange(desc(number))
+
+monthly.counts <- revisions.processed %>% 
+  # select(article_id, year, month, year.mon) %>% 
+  group_by(article_id, year_month) %>% 
+  summarise(count = n())
+  
+# arrange(monthly.counts, article_id, year_month)
+
+
+p <- ggplot(data = monthly.counts, aes(x=year_month, y = count, colour = article_id)) + 
+  geom_line(aes(group = article_id)) +
+  geom_point() +
+  ggtitle("Number of Article Revisons by Year & Month") +
+  xlab("Year-Month")
+
+p
+```
+
+Slide With Plot
+========================================================
+```{r}
+# ggplotly(p)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Slide With Code
 ========================================================
