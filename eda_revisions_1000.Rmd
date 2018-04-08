@@ -135,7 +135,7 @@ p <- ggplot(data = percent.revisions, aes(x=year_month, y = percent, colour = ar
   geom_line(aes(group = article_id)) + 
   geom_point() +
   xlab("Year-Month") +
-  ggtitle("Revisions Per Year Month Normalized by Total Revisions")
+  ggtitle("Revisions Per Year-Month Normalized by Total Revisions")
 
 p
 
@@ -144,8 +144,51 @@ p
 
 
 
-Plot this with first revision to get plot to prove our point about article ids and article age.
-Looks like articles that were created after 2006, might not have had time to show true trends of the lifecycle of the article. Let's only look at records that were first edited before 2006.
+Plot this with first revision to get plot to prove our point about article ids and article age.  
+
+
+Looks like articles that were created after 2006, might not have had time to show true trends of the lifecycle of the article. Let's only look at records that were first edited before 2006.  
+
+
+# First Revision Date for Articles First Edited Before 2006  
+
+When was the Wiki page first revised? That information will help inform us about the behavior of a page relative to other pages created at different times.  
+
+Plot this with first revision to get plot to prove our point about article ids and article age.  
+
+Looks like articles that were created after 2006, might not have had time to show true trends of the lifecycle of the article. Let's only look at records that were first edited before 2006. 
+
+this won't work if the data isn't sorted by date
+need date of first revision for each article id  
+
+
+For each id, obtain the first time it was edited.  
+
+```{r}
+articles.before.2006 <- percent.revisions %>% 
+  mutate(year_month = as.Date(year_month, format='%b %y')) %>% 
+  group_by(article_id) %>%
+  summarize(first_revis_date = min(year_month))
+```
+
+
+
+```{r}
+t.first <- percents[!duplicated(percents$article_id),]
+arrange(t.first, desc(date))
+t.first.before2003 <- subset(t.first, as.yearmon(date) < as.yearmon("2003-01"))
+arrange(t.first.before2003, desc(date))
+```
+
+
+So now we know which article_id's were created before 2006.
+We need to subset the data for these article_ids
+```{r}
+filtered_revisions <- percents[percents$article_id %in% t.first.before2003$article_id, ]
+arrange(filtered_revisions, article_id)
+ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + geom_point()
+ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + ylim(0,.5) + geom_point()
+```
 
 
 
