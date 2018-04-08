@@ -19,6 +19,7 @@ library(tidyverse)
 library(plotly)
 library(janitor)
 library(lubridate)
+library(zoo)
 ```
 
 # Use UNIX commands to clean file  
@@ -55,7 +56,10 @@ revisions.processed <- revisions %>%
   clean_names() %>% 
   mutate(timestamp = gsub("T", " ", timestamp)) %>% 
   mutate(timestamp = gsub("Z", "", timestamp)) %>% 
-  mutate(timestamp = ymd_hms(timestamp))
+  mutate(timestamp = ymd_hms(timestamp)) %>% 
+  mutate(year = year(timestamp)) %>% 
+  mutate(month = month(timestamp)) %>% 
+  mutate(year_month = as.yearmon(timestamp))
 ```
 
 # Grab all categories for each article_id  
@@ -84,7 +88,7 @@ categories.df <- cbind(article_id = categories$article_id, categories.df)
 from wide to long format
 replace empties with NA and filter them out
 ```{r}
-df3 <- categories.df %>% 
+categories.counts <- categories.df %>% 
   gather(category, categories, -article_id) %>%
   replace(. == "", NA) %>%
   filter(!is.na(categories)) %>%
@@ -97,32 +101,52 @@ df3 <- categories.df %>%
 
 # Back to Working with Dates  
 
-
-Separate the date, create monthly counts
+##create monthly counts  
 ```{r}
-date_split <- separate(data = revisions_processed, col = date, into = c('year', 'month', 'day'), sep = "-")
-monthlycounts <- date_split %>%
-  group_by(article_id, year, month) %>%
+monthly.counts <- revisions.processed %>% 
+  # select(article_id, year, month, year.mon) %>% 
+  group_by(article_id, year_month) %>% 
   summarise(count = n())
-arrange(monthlycounts, article_id, year, month)
+  
+arrange(monthly.counts, article_id, year_month)
+
+
+p <- ggplot(data = monthly.counts, aes(x=year_month, y = count, colour = article_id)) + 
+  geom_line(aes(group = article_id)) +
+  geom_point() +
+  ggtitle("Number of Article Revisons by Year & Month") +
+  xlab("Year-Month")
+
+p
+
+# ggplotly(p)
 ```
+  
+    
+It could be interesting to look at which articles have such high amounts of revisions.
+
+For now, let's normalize by total number of revisions to get percentages.
 ```{r}
-revisions_to_dates <- revisions_processed
-revisions_to_dates$date <- as.Date(revisions_to_dates$date, '%Y-%m-%d')
-str(revisions_to_dates)
+percent.revisions <- monthly.counts %>%
+  group_by(article_id) %>%
+  mutate(percent = count/sum(count))
+
+p <- ggplot(data = percent.revisions, aes(x=year_month, y = percent, colour = article_id)) + 
+  geom_line(aes(group = article_id)) + 
+  geom_point() +
+  xlab("Year-Month") +
+  ggtitle("Revisions Per Year Month Normalized by Total Revisions")
+
+p
+
+# ggplotly(p)
 ```
 
-```{r}
-revisions_to_dates$date <- format(revisions_to_dates$date, format="%Y-%m")
-revisions_to_dates
 
-collapsed <- revisions_to_dates %>%
-  group_by(article_id, date) %>%
-  summarise(count = n())
-arrange(collapsed, desc(count))
 
-library(zoo)
-ggplot(data = collapsed, aes(x=as.yearmon(date), y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() 
-```
+Plot this with first revision to get plot to prove our point about article ids and article age.
+Looks like articles that were created after 2006, might not have had time to show true trends of the lifecycle of the article. Let's only look at records that were first edited before 2006.
+
+
 
 
