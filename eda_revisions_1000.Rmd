@@ -1,11 +1,15 @@
 ---
 title: "EDA of Revisions"
+author: "Kevin, Fanny"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+Combining Kevin's Readme with additional graphics  
+
 
 # Load libraries  
 ```{r}
@@ -56,9 +60,69 @@ revisions.processed <- revisions %>%
 
 # Grab all categories for each article_id  
 ```{r}
+categories <-  revisions.processed %>% 
+  group_by(article_id) %>% 
+  summarise(categories=paste(category, collapse = " "))
 
+categories$categories <- sapply(strsplit(categories$categories, split=" "), function(x) {
+  paste0(unique(trimws(x)), collapse = ', ')
+})
+
+tail(categories, 10)
+```
+
+Split up the categories listed within each row entry  
+```{r}
+categories.df <- as.data.frame(str_split_fixed(categories$categories, ", ", max(unlist(lapply(strsplit(categories$categories, ", "), length)))))
+
+categories.df <- categories.df[,-1]
+names(categories.df) <- paste0("category_", 1:ncol(categories.df))
+categories.df <- cbind(article_id = categories$article_id, categories.df)
+```
+
+# Tidy up categories  
+from wide to long format
+replace empties with NA and filter them out
+```{r}
+df3 <- categories.df %>% 
+  gather(category, categories, -article_id) %>%
+  replace(. == "", NA) %>%
+  filter(!is.na(categories)) %>%
+  select(-category) %>%
+  group_by(categories) %>%
+  summarise(number = n()) %>%
+  arrange(desc(number)) 
 ```
 
 
+# Back to Working with Dates  
+
+
+Separate the date, create monthly counts
+```{r}
+date_split <- separate(data = revisions_processed, col = date, into = c('year', 'month', 'day'), sep = "-")
+monthlycounts <- date_split %>%
+  group_by(article_id, year, month) %>%
+  summarise(count = n())
+arrange(monthlycounts, article_id, year, month)
+```
+```{r}
+revisions_to_dates <- revisions_processed
+revisions_to_dates$date <- as.Date(revisions_to_dates$date, '%Y-%m-%d')
+str(revisions_to_dates)
+```
+
+```{r}
+revisions_to_dates$date <- format(revisions_to_dates$date, format="%Y-%m")
+revisions_to_dates
+
+collapsed <- revisions_to_dates %>%
+  group_by(article_id, date) %>%
+  summarise(count = n())
+arrange(collapsed, desc(count))
+
+library(zoo)
+ggplot(data = collapsed, aes(x=as.yearmon(date), y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() 
+```
 
 
