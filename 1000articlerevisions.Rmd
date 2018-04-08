@@ -1,0 +1,220 @@
+---
+title: "Untitled"
+author: "Kevin Hunt"
+date: "March 29, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+load in the data and convert to a data frame
+```{r}
+revisions <- do.call(rbind,strsplit(readLines("all_revisions_1000_articles.txt"), "<<sep>>",fixed=T))
+head(revisions)
+
+revisions_processed <- 
+  setNames(
+    as.data.frame(lapply(1:ncol(revisions), function (i) {
+      type.convert(revisions[,i], as.is = TRUE)
+    }), stringsAsFactors = FALSE),
+    c("article_id", "rev_id", "article_title", "timestamp", "[ip:]username", "user_id", "CATEGORY", "IMAGE", "MAIN", "TALK", "USER", "USER_TALK", "OTHER", "EXTERNAL",
+      "TEMPLATE", "COMMENT", "MINOR", "TEXTDATA")
+  )
+library(tidyr)
+revisions_processed <- separate(data = revisions_processed, col = timestamp, into = c('date', 'time'), sep = "T")
+str(revisions_processed)
+head(revisions_processed)
+```
+I want to grab all the categories for each article_id
+```{r}
+categories <- revisions_processed %>%
+  group_by(article_id) %>%
+  summarise(CATEGORIES=paste(CATEGORY, collapse = " "))
+head(categories, 10) 
+
+categories$CATEGORIES <- sapply(strsplit(categories$CATEGORIES, split=" "), function(x) {
+  paste0(unique(trimws(x)), collapse = ', ')
+})
+
+
+library(tidyverse)
+categoriesdf <- as.data.frame(str_split_fixed(categories$CATEGORIES, ", ", max(unlist(lapply(strsplit(categories$CATEGORIES, ", "), length)))))
+categoriesdf <- categoriesdf[,-1]
+names(categoriesdf) <- paste0("category_", 1:ncol(categoriesdf))
+categoriesdf <- cbind(article_id = categories$article_id, categoriesdf)
+head(categoriesdf, 10)
+str(categoriesdf)
+```
+
+Now to tidy it up:
+from wide to long format
+replace empties with NA and filter them out
+```{r}
+library(dplyr)
+df3 <- categoriesdf %>% 
+  gather(category, CATEGORIES, -article_id) %>%
+  replace(. == "", NA) %>%
+  filter(!is.na(CATEGORIES)) %>%
+  select(-category) %>%
+  group_by(CATEGORIES) %>%
+  summarise(number = n()) %>%
+  arrange(desc(number)) 
+head(df3, 10)
+str(df3)
+```
+
+## Date work
+Separate the date, create monthly counts
+```{r}
+date_split <- separate(data = revisions_processed, col = date, into = c('year', 'month', 'day'), sep = "-")
+monthlycounts <- date_split %>%
+  group_by(article_id, year, month) %>%
+  summarise(count = n())
+arrange(monthlycounts, article_id, year, month)
+```
+```{r}
+revisions_to_dates <- revisions_processed
+revisions_to_dates$date <- as.Date(revisions_to_dates$date, '%Y-%m-%d')
+str(revisions_to_dates)
+```
+
+```{r}
+revisions_to_dates$date <- format(revisions_to_dates$date, format="%Y-%m")
+revisions_to_dates
+
+collapsed <- revisions_to_dates %>%
+  group_by(article_id, date) %>%
+  summarise(count = n())
+arrange(collapsed, desc(count))
+
+library(zoo)
+ggplot(data = collapsed, aes(x=as.yearmon(date), y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() 
+```
+
+It could be interesting to look at which articles have such high amounts of revisions.
+For now, let's normalize by total number of revisions to get percentages.
+```{r}
+percents <- collapsed %>%
+  group_by(article_id) %>%
+  mutate(percent = count/sum(count))
+
+library(zoo)
+ggplot(data = percents, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() 
+```
+
+Looks like articles that were created after 2006, might not have had time to show true trends of the lifecycle of the article. Let's only look at records that were first edited before 2006.
+
+```{r}
+# this won't work if the data isn't sorted by date
+# date of first revision for each article id
+t.first <- percents[!duplicated(percents$article_id),]
+arrange(t.first, desc(date))
+t.first.before2003 <- subset(t.first, as.yearmon(date) < as.yearmon("2003-01"))
+arrange(t.first.before2003, desc(date))
+```
+
+So now we know which article_id's were created before 2006.
+We need to subset the data for these article_ids
+```{r}
+filtered_revisions <- percents[percents$article_id %in% t.first.before2003$article_id, ]
+arrange(filtered_revisions, article_id)
+ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + geom_point()
+ggplot(data = filtered_revisions, aes(x=as.yearmon(date), y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + ylim(0,.5) + geom_point()
+```
+
+Convert records to time since first revision
+```{r}
+aligned_revisions <- filtered_revisions
+aligned_revisions$first <- t.first$date[match(aligned_revisions$article_id, t.first$article_id)]
+aligned_revisions$time.since.creation <- (as.yearmon(aligned_revisions$date) - as.yearmon(aligned_revisions$first))*12
+aligned_revisions$time.since.creation <- as.integer(round(aligned_revisions$time.since.creation))
+library(scales)
+ggplot(data = aligned_revisions, aes(x=time.since.creation/12, y = percent, colour = article_id)) + geom_line(aes(group = article_id)) + scale_y_continuous(labels = scales::percent) + geom_point()
+```
+
+Okay so there might be some trends that are obfuscated because we do not have 0% for months where there are no edits.
+```{r}
+library(data.table)
+all_months <- as.data.frame(dcast(setDT(aligned_revisions), article_id ~ time.since.creation, value.var='percent'))
+all_months[is.na(all_months)] <- 0
+all_months
+
+library(reshape2)
+library(ggvis)
+
+df1 <- melt(all_months, "article_id")
+df1$variable <- as.integer(df1$variable)
+
+ggplot(data = df1, aes(x=variable, y = value, colour = article_id)) + geom_line(aes(group = article_id)) + scale_y_continuous(labels = scales::percent) + geom_point()
+```
+
+Okay so we could use a plot to show why we are throwing out articles that's first revision was after some date.
+And we need to recalculate percents to be windows of 5 years. So percent of the revisions that occur in the first five years or two years?
+
+```{r}
+ggplot(data = collapsed, aes(x=as.yearmon(date), y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() 
+```
+
+Okay so we need to remove articles that were first revised after 5 years before last date (2008-01) on the date with the original counts, not percentages
+```{r}
+filtered_revisions_counts <- collapsed[collapsed$article_id %in% t.first.before2003$article_id, ]
+arrange(filtered_revisions_counts, article_id)
+ggplot(data = filtered_revisions_counts, aes(x=as.yearmon(date), y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_vline(xintercept = as.yearmon("2003-01"), colour = "red") + geom_point()
+```
+
+Okay. Now we want need to convert date to months since creations (so we can cap off the first 5 years).
+Convert records to time since first revision
+```{r}
+aligned_revisions_counts <- filtered_revisions_counts
+aligned_revisions_counts$first <- t.first$date[match(aligned_revisions_counts$article_id, t.first$article_id)]
+aligned_revisions_counts$time.since.creation <- round((as.yearmon(aligned_revisions_counts$date) - as.yearmon(aligned_revisions_counts$first))*12)
+
+library(scales)
+ggplot(data = aligned_revisions_counts, aes(x=time.since.creation/12, y = count, colour = article_id)) + geom_line(aes(group = article_id)) + geom_point() + xlab("Years since First Revision")
+```
+This is really interesting that smaller article_ids (older articles?) were heavily edited around 4-6 years after first creation.
+Okay now we need to convert to wide format.
+
+```{r}
+library(data.table)
+all_months_counts <- as.data.frame(dcast(setDT(aligned_revisions_counts), article_id ~ time.since.creation, value.var='count'))
+all_months_counts[is.na(all_months_counts)] <- 0
+all_months_counts
+
+library(reshape2)
+library(ggvis)
+
+df1_counts <- melt(all_months_counts, "article_id")
+df1_counts$variable <- as.integer(df1_counts$variable)
+
+ggplot(data = df1_counts, aes(x=variable, y = value, colour = article_id)) + geom_line(aes(group = article_id))
+```
+Okay. So since the cut-off date was 2003-01, then the maximum amount of time for revisions is 5 years. Thus we should cut off all the data after 60 months since first revision. Then convert the values to percentages of all revisions.
+```{r}
+data_5yrs <- all_months_counts[,0:62]
+data_5yrs_norm <- data_5yrs
+data_5yrs_norm$totalrevisions <- rowSums(data_5yrs[,2:62])
+data_5yrs_norm[,2:62] <- data_5yrs[,2:62]/data_5yrs_norm$totalrevisions
+df1_5yrs <- melt(data_5yrs_norm, c("article_id", "totalrevisions"))
+df1_5yrs$variable <- as.integer(df1_5yrs$variable)
+
+ggplot(data = df1_5yrs, aes(x=variable, y = value)) + geom_line(aes(group = article_id, color=totalrevisions), size = 0.2) + scale_y_continuous(labels = scales::percent) + ylab("Percent of Article Revisions") + xlab("Months since First Revision")
+```
+
+I want to discretize the number of total revisions
+```{r}
+data_5yrs_norm$bins <- cut(data_5yrs_norm$totalrevisions, breaks=c(0,2,10,25,100, 500, 2000), labels=c("1-2", "3-10", "10-25", "25-100", "100-500", "500-"))
+
+df1_5yrs <- melt(data_5yrs_norm, c("article_id", "totalrevisions", "bins"))
+df1_5yrs$variable <- as.integer(df1_5yrs$variable)
+
+ggplot(data = df1_5yrs, aes(x=variable, y = value)) + geom_line(aes(group = article_id, color=bins), size = 0.3) + scale_y_continuous(labels = scales::percent) + ylab("Percent of Article Revisions") + xlab("Months since First Revision") + labs(color = "Total Article Revisions") + scale_color_hue(direction = -1) + facet_grid(~bins) + theme(legend.position="none")
+```
+
+What's happening with articles that have over 500 revisions
+```{r}
+ggplot(data = df1_5yrs[df1_5yrs$bins == "500-",], aes(x=variable, y = value)) + geom_line(aes(group = article_id, color=bins), size = 0.5) + scale_y_continuous(labels = scales::percent) + ylab("Percent of Article Revisions") + xlab("Months since First Revision") + labs(color = "Total Article Revisions") + scale_color_hue(direction = 1) + facet_grid(~bins) + theme(legend.position="none")
+```
+

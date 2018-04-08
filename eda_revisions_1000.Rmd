@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "EDA of Revisions"
 output: html_document
 ---
 
@@ -11,12 +11,58 @@ knitr::opts_chunk$set(echo = TRUE)
 library(data.table)
 library(here)
 ```
+
+
 ```{r}
-#system("sed 's/<<sep>>/,/g' all_revisions_1000_articles.txt > all_revisions_1000_articles_commaseparated.txt")
-
-all.revisions.1000.path <- here("all_revisions_1000_articles_commaseparated.txt")
-
-revisions <- read.table(all.revisions.1000.path, sep = ",", fill=TRUE)
-head(revisions)
+# system("sed 's/<<sep>>/^/g' all_revisions_1000_articles.txt > all_revisions_1000_articles_caratseparated.txt")
+# 
+# cat(readLines("all_revisions_1000_articles_caratseparated.txt"), sep = "^")
 ```
+
+
+```{r}
+all.revisions.1000.path <- here("all_revisions_1000_articles_caratseparated.txt")
+
+revisions <- read.table(all.revisions.1000.path, 
+                        sep = "^",
+                        quote="",
+                        header=FALSE,
+                        col.names = c("article_id", "rev_id", "article_title", "timestamp", "[ip:]username", "user_id", "CATEGORY", "IMAGE", "MAIN", "TALK", "USER", "USER_TALK", "OTHER", "EXTERNAL",
+      "TEMPLATE", "COMMENT", "MINOR", "TEXTDATA"),
+      fill=TRUE)
+
+# head(revisions)
+colnames(revisions) <- c("article_id", "rev_id", "article_title", "timestamp", "[ip:]username", "user_id", "CATEGORY", "IMAGE", "MAIN", "TALK", "USER", "USER_TALK", "OTHER", "EXTERNAL",
+      "TEMPLATE", "COMMENT", "MINOR", "TEXTDATA")
+
+tail(revisions)
+```
+
+# Ignore above    
+```{r}
+# revisions.z <- do.call(rbind,strsplit(readLines("all_revisions_1000_articles.txt"), "<<sep>>",fixed=T))
+# head(revisions.z)
+# 
+# revisions_processed <- 
+#   setNames(
+#     as.data.frame(lapply(1:ncol(revisions.z), function (i) {
+#       type.convert(revisions.z[,i], as.is = TRUE)
+#     }), stringsAsFactors = FALSE),
+#     c("article_id", "rev_id", "article_title", "timestamp", "[ip:]username", "user_id", "CATEGORY", "IMAGE", "MAIN", "TALK", "USER", "USER_TALK", "OTHER", "EXTERNAL",
+#       "TEMPLATE", "COMMENT", "MINOR", "TEXTDATA")
+#   )
+
+library(tidyr)
+revisions_processed <- separate(data = revisions_processed, col = timestamp, into = c('date', 'time'), sep = "T")
+str(revisions_processed)
+head(revisions_processed)
+```  
+
+```{r}
+
+```
+
+
+
+
 
