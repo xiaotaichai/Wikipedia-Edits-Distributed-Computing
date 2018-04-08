@@ -118,6 +118,8 @@ p <- ggplot(data = monthly.counts, aes(x=year_month, y = count, colour = article
   xlab("Year-Month")
 
 p
+ggsave("img/article-revisions-by-year-month.png", p)
+
 
 ggplotly(p)
 ```
@@ -139,7 +141,7 @@ p <- ggplot(data = percent.revisions, aes(x=year_month, y = percent, colour = ar
 
 p
 
-# ggplotly(p)
+ggplotly(p)
 ```
 
 
