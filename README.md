@@ -17,6 +17,9 @@ SNAP (Stanford) compressed zip file with all of Wikipedia's revisions from its i
 See this repo:  
 https://github.com/Kevinisagirl/Wikipedia-Revisions-1000-articleid-sample
 
+# Presentation  
+See slides here:  
+https://docs.google.com/presentation/d/1LYECSEUcr-U4f8_LEu3NOtIeOdiGqwZKGR-7UpIUO58/edit
 
 # Development  
 
