@@ -13,6 +13,11 @@ SNAP (Stanford) compressed zip file with all of Wikipedia's revisions from its i
 * Generate a list of unique article_ids  
 * Aggregate attributes associated with each article_id  
 
+# Analysis  
+See this repo:  
+https://github.com/Kevinisagirl/Wikipedia-Revisions-1000-articleid-sample
+
+
 # Development  
 
 ### Run   
