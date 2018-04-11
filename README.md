@@ -1,5 +1,34 @@
 # Wikipedia-Edits-Distributed-Computing
 
+.
+├── README.md
+├── creation-timeline
+│   └── creation_timelines_toCSV.py
+├── data
+│   ├── all_revisions_1000_articles.txt
+│   ├── all_revisions_1000_articles_caratseparated.txt
+│   ├── all_revisions_1000_articles_commaseparated.txt
+│   └── unique_all_articleids.gz
+├── mrjob.conf
+├── mrjob2.conf
+├── normalized-revision
+│   ├── create_normalized_revision_count_timeline.py
+│   ├── create_normalized_revision_lengths_timeline.py
+│   └── revision_count_timeline_2.py
+├── random-subsample
+│   ├── get_random_subsample.py
+│   ├── get_random_subsample_toCSV.py
+│   └── test_random_subsample.py
+├── test
+│   ├── blank_line_check.py
+│   └── checking_format.py
+└── unique-articles
+    ├── unique-article
+    ├── unique_article.py
+    └── unique_article_ids.py
+
+
+
  
 # Questions of Interest
 *  What are the most commonly edited Wikipedia articles?
