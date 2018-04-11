@@ -16,28 +16,27 @@ Kevin, Lydia, Fanny, Xiaotai
 * How does edit behavior reflect major events in news, culture, tech, or history? 
    
 # Randomly Sample 1000 Article IDs 
-* Generate a list of unique article_ids  
+* Generate a list of unique article_ids    
     `/unique-articles`  
     
-* Collect all article revisions associated with each unique article_id  
+* Collect all article revisions associated with each unique article_id    
     `/random-subsample`
     
 # Compare Revisions  
-* Normalize revisions
+* Normalize revisions  
     `/normalized-revision`  
-* Look at creation timeline  
+* Look at creation timeline    
     `/creation-timeline`  
 
 # Calculate Metadata for Entire Corpus  
 * repeat steps above for entire dataset instead of sample  
     
 # Analysis  
-See this repo:  
-https://github.com/Kevinisagirl/Wikipedia-Revisions-1000-articleid-sample
+See this [repo](https://github.com/Kevinisagirl/Wikipedia-Revisions-1000-articleid-sample).  
+
 
 # Presentation  
-See slides here:  
-https://docs.google.com/presentation/d/1LYECSEUcr-U4f8_LEu3NOtIeOdiGqwZKGR-7UpIUO58/edit
+See slides [here](https://github.com/Kevinisagirl/Wikipedia-Revisions-1000-articleid-sample/blob/master/Wikipedia%20Edits%20Analysis.pdf).    
 
 # Development  
 
