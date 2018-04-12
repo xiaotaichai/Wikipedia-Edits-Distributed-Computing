@@ -27,6 +27,7 @@ class RevisionTimeline(MRJob):
         creation_datetime = dt.datetime.now()
         revisions = list(revisions)
 
+        # find the date of creation, i.e. the date of oldest revision
         for r in revisions:
             revision_datetime = dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ')
             if revision_datetime < creation_datetime:
@@ -39,8 +40,6 @@ class RevisionTimeline(MRJob):
             num_revisions = len(revisions)
             normalized_revision_timeline = [[] for i in range(num_revisions)]
 
-            # creation_datetime = dt.datetime.strptime(values[1],'%Y-%m-%dT%H:%M:%SZ')
-            # revisions = values[0]
             i = 0
             for r in revisions:
                 revision_datetime = dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ')
@@ -50,22 +49,7 @@ class RevisionTimeline(MRJob):
 
 
             yield key , [creation_datetime.strftime('%Y-%m-%d %H:%M:%S'), num_revisions, normalized_revision_timeline]
-        # yield key , [revisions, creation_datetime_str, num_revisions]
 
-    # def reducerCreateTimeline(self, key, values):
-    #
-    #     num_revisions = values[2]
-    #     normalized_revision_timeline = []*num_revisions
-    #
-    #     creation_datetime = dt.datetime.strptime(values[1],'%Y-%m-%dT%H:%M:%SZ')
-    #     revisions = values[0]
-    #     i = 0
-    #     for r in revisions:
-    #         revision_datetime = dt.datetime.strptime(r[0],'%Y-%m-%dT%H:%M:%SZ')
-    #         time_since_creation = revision_datetime - creation_datetime
-    #         normalized_revision_timeline[i] = [time_since_creation.days, time_since_creation.seconds, r[1], r[2]]
-    #         i += 1
-    #     yield key + (creation_datetime.strftime('%Y-%m-%d %H:%M:%S'),num_revisions), normalized_revision_timeline
     def steps(self):
         return [
             MRStep(mapper=self.mapperGroupRevisions,
